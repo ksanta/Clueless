@@ -1,8 +1,11 @@
 package lol.karl.clueless;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 import java.util.*;
 
+@Slf4j
 public class Clueless {
 
     private Dictionary dictionary;
@@ -14,18 +17,19 @@ public class Clueless {
     /**
      * @param clues         all the incoming clues in the puzzle
      * @param solvedLetters the starter clues, which will be populated
+     * @param finalPuzzle   the last "clue" to solve
      * @param guessDepth    the number of guesses we are relying on at this point
-     * @return the answer to the puzzle
+     * @return the answer to the puzzle, or null if there are no solutions with the given inputs
      */
     public String solve(List<Clue> clues, String[] solvedLetters, Clue finalPuzzle, int guessDepth) {
         findSureAnswers(clues, solvedLetters);
 
         // Only try and solve the final answer if there are currently no guesses or if all the clues are successfully used
         if (guessDepth == 0 || clues.isEmpty()) {
-            System.out.println("Attempting to solve final answer");
+            log.debug("Attempting to solve final answer");
             finalPuzzle.updatePatternAndMatchingWords(solvedLetters, dictionary);
             if (finalPuzzle.hasSureAnswer()) {
-                System.out.println("Final clue " + finalPuzzle.pattern.pattern() + " can only be " + finalPuzzle.possibleAnswers.get(0));
+                log.debug("Final clue {} can only be {}", finalPuzzle.pattern.pattern(), finalPuzzle.possibleAnswers.get(0));
                 return finalPuzzle.possibleAnswers.get(0);
             }
         }
@@ -36,7 +40,7 @@ public class Clueless {
             Clue clueWithLeastAlternatives = clues.get(0);
 
             if (clueWithLeastAlternatives.numPossibleAnswers == 0) {
-                System.out.println("Clue " + clueWithLeastAlternatives.pattern + " has no solution!");
+                log.debug("Clue {} has no solution!", clueWithLeastAlternatives.pattern);
                 return null;
             }
 
@@ -44,7 +48,7 @@ public class Clueless {
 
             // Attempt to solve using each possible alternative
             for (String possibleAnswer : clueWithLeastAlternatives.possibleAnswers) {
-                System.out.println("Branching out, trying " + possibleAnswer + ", out of " + clueWithLeastAlternatives.possibleAnswers);
+                log.debug("Branching out, trying {}, out of {}", possibleAnswer, clueWithLeastAlternatives.possibleAnswers);
                 String[] prospectiveSolvedLetters = createNewSolvedLettersWithAnswer(clueWithLeastAlternatives, possibleAnswer, solvedLetters);
                 String finalAnswer = solve(clues, prospectiveSolvedLetters, finalPuzzle, guessDepth + 1);
                 if (finalAnswer != null) {
@@ -52,7 +56,7 @@ public class Clueless {
                 }
             }
 
-            System.out.println("Backtracking, re-adding " + clueWithLeastAlternatives.pattern);
+            log.debug("Backtracking, re-adding {}", clueWithLeastAlternatives.pattern);
             clues.add(clueWithLeastAlternatives);
         }
 
@@ -70,21 +74,21 @@ public class Clueless {
                 clue.updatePatternAndMatchingWords(solvedLetters, dictionary);
             }
 
-            System.out.println("Scanning " + clues.size() + " clues for sure answers");
+            log.debug("Scanning {} clues for sure answers", clues.size());
             newLetterDiscovered = false;
             Iterator<Clue> clueIterator = clues.iterator();
             while (clueIterator.hasNext()) {
                 Clue clue = clueIterator.next();
 
                 if (clue.hasSureAnswer()) {
-                    System.out.println("Clue " + clue.pattern.pattern() + " can only be " + clue.possibleAnswers.get(0));
+                    log.debug("Clue {} can only be {}", clue.pattern.pattern(), clue.possibleAnswers.get(0));
                     updateSolvedLettersWithAnswer(clue, clue.possibleAnswers.get(0), solvedLetters);
                     newLetterDiscovered = true;
                     clueIterator.remove();
                 }
             }
         }
-        System.out.println("No more sure answers");
+        log.debug("No more sure answers");
     }
 
     private String[] createNewSolvedLettersWithAnswer(Clue clue, String answer, String[] solvedLetters) {
@@ -98,7 +102,7 @@ public class Clueless {
             int clueNumber = clue.digits[i];
             if (solvedLetters[clueNumber] == null) {
                 char discoveredLetter = answer.charAt(i);
-                System.out.println("  Solved " + clueNumber + " = " + discoveredLetter);
+                log.debug("  Solved {} = {}", clueNumber, discoveredLetter);
                 solvedLetters[clueNumber] = String.valueOf(discoveredLetter);
             }
         }

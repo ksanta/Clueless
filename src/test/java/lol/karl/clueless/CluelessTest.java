@@ -1,5 +1,6 @@
 package lol.karl.clueless;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+@Slf4j
 public class CluelessTest {
 
     @Test
@@ -65,8 +67,6 @@ public class CluelessTest {
 
         String solution = clueless.solve(new ArrayList<>(clues), solvedLetters, finalPuzzle, 0);
 
-        System.out.println("Final solution: " + solution);
-
         assertThat(solution, is("ENJOYS"));
     }
 
@@ -88,10 +88,6 @@ public class CluelessTest {
         Clue finalPuzzle = new Clue(new int[]{19, 24, 15, 21, 4});
 
         String solution = clueless.solve(new ArrayList<>(clues), solvedLetters, finalPuzzle, 0);
-
-        printSolvedLetters(solvedLetters);
-
-        System.out.println("Final solution: " + solution);
 
         assertThat(solution, is("BLINK"));
     }
@@ -127,10 +123,6 @@ public class CluelessTest {
         Clue finalPuzzle = new Clue(new int[]{23, 7, 8, 26, 9, 3});
 
         String solution = clueless.solve(new ArrayList<>(clues), solvedLetters, finalPuzzle, 0);
-
-        printSolvedLetters(solvedLetters);
-
-        System.out.println("Final solution: " + solution);
 
         assertThat(solution, is("BLAZES"));
     }
@@ -169,22 +161,6 @@ public class CluelessTest {
 
         String solution = clueless.solve(new ArrayList<>(clues), solvedLetters, finalClue, 0);
 
-        printSolvedLetters(solvedLetters);
-
-        System.out.println("Final solution: " + solution);
-
         assertThat(solution, is("CRIMSON"));
-    }
-
-    private void printSolvedLetters(String[] solvedLetters) {
-        System.out.print("Known letters: ");
-        for (int i = 1; i < solvedLetters.length; i++) {
-            String letter = solvedLetters[i];
-            if (letter == null) {
-                letter = "-";
-            }
-            System.out.print(letter + ", ");
-        }
-        System.out.println();
     }
 }
