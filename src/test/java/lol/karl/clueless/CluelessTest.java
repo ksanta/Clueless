@@ -1,6 +1,5 @@
 package lol.karl.clueless;
 
-import lol.karl.clueless.Clueless.Clue;
 import org.junit.Test;
 
 import java.io.IOException;
