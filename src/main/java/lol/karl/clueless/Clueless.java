@@ -2,16 +2,18 @@ package lol.karl.clueless;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 @Slf4j
 public class Clueless {
 
     private Dictionary dictionary;
 
-    public Clueless() throws IOException {
-        this.dictionary = new Dictionary();
+    public Clueless(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
     /**

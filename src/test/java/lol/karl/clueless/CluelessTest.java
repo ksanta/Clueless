@@ -1,6 +1,7 @@
 package lol.karl.clueless;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,6 +13,14 @@ import static org.junit.Assert.assertThat;
 
 @Slf4j
 public class CluelessTest {
+
+    private static Dictionary dictionary;
+
+    @BeforeClass
+    public static void setup() throws IOException {
+        dictionary = new Dictionary();
+    }
+
 
     @Test
     public void testClueIsValid() {
@@ -40,10 +49,11 @@ public class CluelessTest {
     }
 
     @Test
-    public void solveDecember2019() throws IOException {
-        Clueless clueless = new Clueless();
+    public void solveDecember2019() {
+        Clueless clueless = new Clueless(dictionary);
 
         List<Clue> clues = new ArrayList<>();
+        // Across clues
         clues.add(new Clue(new int[]{20, 21, 4, 9, 23, 25}));
         clues.add(new Clue(new int[]{25, 3, 3, 4, 24, 7}));
         clues.add(new Clue(new int[]{4, 2, 19, 1, 19, 22, 12}));
@@ -57,6 +67,33 @@ public class CluelessTest {
         clues.add(new Clue(new int[]{18, 25, 19, 2}));
         clues.add(new Clue(new int[]{1, 23, 14, 12}));
         clues.add(new Clue(new int[]{19, 5, 25, 8, 12}));
+        clues.add(new Clue(new int[]{9, 12, 14, 12, 19, 21}));
+        clues.add(new Clue(new int[]{20, 19, 18, 24, 13, 12}));
+        clues.add(new Clue(new int[]{22, 12, 3, 12, 23, 8, 12}));
+        clues.add(new Clue(new int[]{12, 10, 24, 13, 25, 22, 12}));
+        clues.add(new Clue(new int[]{19, 20, 24, 12, 3, 21}));
+        clues.add(new Clue(new int[]{22, 26, 7, 18, 12, 20}));
+        // Down clues
+        clues.add(new Clue(new int[]{22, 4, 5, 5, 12, 9}));
+        clues.add(new Clue(new int[]{18, 25, 9, 12, 22, 2}));
+        clues.add(new Clue(new int[]{19, 15, 25}));
+        clues.add(new Clue(new int[]{21, 22, 19, 23, 2, 12, 9}));
+        clues.add(new Clue(new int[]{19, 14, 14, 12, 3, 21, 20}));
+        clues.add(new Clue(new int[]{9, 22, 19, 1, 2}));
+        clues.add(new Clue(new int[]{19, 20, 23, 9, 12}));
+        clues.add(new Clue(new int[]{19, 3, 22, 25, 5, 19, 21}));
+        clues.add(new Clue(new int[]{25, 5, 12, 7}));
+        clues.add(new Clue(new int[]{17, 12, 24, 21}));
+        clues.add(new Clue(new int[]{1, 19, 22, 22, 23, 25, 22}));
+        clues.add(new Clue(new int[]{25, 10, 12, 2}));
+        clues.add(new Clue(new int[]{9, 12, 19, 22}));
+        clues.add(new Clue(new int[]{20, 2, 12, 12, 6, 12, 20}));
+        clues.add(new Clue(new int[]{3, 25, 4, 15, 26}));
+        clues.add(new Clue(new int[]{19, 24, 24, 13, 7}));
+        clues.add(new Clue(new int[]{24, 4, 13, 13, 23, 2, 15}));
+        clues.add(new Clue(new int[]{23, 18, 24, 22, 25, 8, 12}));
+        clues.add(new Clue(new int[]{3, 7, 3, 13, 12, 9}));
+        clues.add(new Clue(new int[]{12, 13, 12, 8, 12, 2}));
 
         String[] solvedLetters = new String[27];
         solvedLetters[9] = "D";
@@ -71,8 +108,8 @@ public class CluelessTest {
     }
 
     @Test
-    public void solveNovember2019() throws IOException {
-        Clueless clueless = new Clueless();
+    public void solveNovember2019() {
+        Clueless clueless = new Clueless(dictionary);
 
         List<Clue> clues = new ArrayList<>();
         clues.add(new Clue(new int[]{25, 13, 16, 10, 19, 24, 15, 7}));
@@ -93,8 +130,8 @@ public class CluelessTest {
     }
 
     @Test
-    public void solveSeptember2019() throws IOException {
-        Clueless clueless = new Clueless();
+    public void solveSeptember2019() {
+        Clueless clueless = new Clueless(dictionary);
 
         List<Clue> clues = new ArrayList<>();
         clues.add(new Clue(new int[]{3, 11, 14, 18, 23, 3}));
@@ -128,8 +165,8 @@ public class CluelessTest {
     }
 
     @Test
-    public void solveOctober2014() throws IOException {
-        Clueless clueless = new Clueless();
+    public void solveOctober2014() {
+        Clueless clueless = new Clueless(dictionary);
 
         List<Clue> clues = new ArrayList<>();
         // Across
