@@ -2,10 +2,7 @@ package lol.karl.clueless;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class Clueless {
@@ -29,28 +26,30 @@ public class Clueless {
         // Only try and solve the final answer if there are currently no guesses or if all the clues are successfully used
         if (guessDepth == 0 || clues.isEmpty()) {
             log.debug("Attempting to solve final answer");
-            finalPuzzle.updatePatternAndMatchingWords(solvedLetters, dictionary);
+            Set<String> wordsByLength = dictionary.getWordsByLength(finalPuzzle.digits.length);
+            finalPuzzle.updatePatternAndMatchingWords(solvedLetters, wordsByLength);
             if (finalPuzzle.hasSureAnswer()) {
-                log.debug("Final clue {} can only be {}", finalPuzzle.pattern.pattern(), finalPuzzle.possibleAnswers.get(0));
-                return finalPuzzle.possibleAnswers.get(0);
+                log.debug("Final clue {} can only be {}", finalPuzzle.pattern.pattern(), finalPuzzle.matchingWords.get(0));
+                return finalPuzzle.matchingWords.get(0);
             }
         }
 
         if (!clues.isEmpty()) {
             // Find clue with least alternatives and remove from list of clues
-            clues.sort(Comparator.comparingInt(clue -> clue.numPossibleAnswers));
+            clues.sort(Comparator.comparingInt(clue -> clue.matchingWords.size()));
             Clue clueWithLeastAlternatives = clues.get(0);
 
-            if (clueWithLeastAlternatives.numPossibleAnswers == 0) {
+            if (clueWithLeastAlternatives.matchingWords.size() == 0) {
                 log.debug("Clue {} has no solution!", clueWithLeastAlternatives.pattern);
+                clues.forEach(clue -> clue.matchingWords.clear());
                 return null;
             }
 
             clues.remove(clueWithLeastAlternatives);
 
             // Attempt to solve using each possible alternative
-            for (String possibleAnswer : clueWithLeastAlternatives.possibleAnswers) {
-                log.debug("Branching out, trying {}, out of {}", possibleAnswer, clueWithLeastAlternatives.possibleAnswers);
+            for (String possibleAnswer : clueWithLeastAlternatives.matchingWords) {
+                log.debug("Branching out, trying {}, out of {}", possibleAnswer, clueWithLeastAlternatives.matchingWords);
                 String[] prospectiveSolvedLetters = createNewSolvedLettersWithAnswer(clueWithLeastAlternatives, possibleAnswer, solvedLetters);
                 String finalAnswer = solve(clues, prospectiveSolvedLetters, finalPuzzle, guessDepth + 1);
                 if (finalAnswer != null) {
@@ -73,7 +72,8 @@ public class Clueless {
         while (newLetterDiscovered) {
             // Update the state of the clues with the latest known info
             for (Clue clue : clues) {
-                clue.updatePatternAndMatchingWords(solvedLetters, dictionary);
+                Set<String> wordsByLength = dictionary.getWordsByLength(clue.digits.length);
+                clue.updatePatternAndMatchingWords(solvedLetters, wordsByLength);
             }
 
             log.debug("Scanning {} clues for sure answers", clues.size());
@@ -83,8 +83,8 @@ public class Clueless {
                 Clue clue = clueIterator.next();
 
                 if (clue.hasSureAnswer()) {
-                    log.debug("Clue {} can only be {}", clue.pattern.pattern(), clue.possibleAnswers.get(0));
-                    updateSolvedLettersWithAnswer(clue, clue.possibleAnswers.get(0), solvedLetters);
+                    log.debug("Clue {} can only be {}", clue.pattern.pattern(), clue.matchingWords.get(0));
+                    updateSolvedLettersWithAnswer(clue, clue.matchingWords.get(0), solvedLetters);
                     newLetterDiscovered = true;
                     clueIterator.remove();
                 }

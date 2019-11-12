@@ -21,7 +21,6 @@ public class CluelessTest {
         dictionary = new Dictionary();
     }
 
-
     @Test
     public void testClueIsValid() {
         String[] solvedLetters = new String[27];

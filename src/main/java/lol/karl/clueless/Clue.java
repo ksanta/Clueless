@@ -1,15 +1,9 @@
 package lol.karl.clueless;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class Clue {
-    // The maximum number of alternate answers to consider
-    private static final int MAX_MATCHING_ANSWERS = 5;
-
     // Each clue is made up of digits, where each digit represents some letter
     int[] digits;
 
@@ -17,22 +11,19 @@ public class Clue {
     Pattern pattern;
 
     // Based on a dictionary, the words that match the pattern
-    List<String> possibleAnswers = new ArrayList<>();
-
-    // The total number of words that the pattern matches in the dictionary
-    int numPossibleAnswers = Integer.MAX_VALUE;
+    List<String> matchingWords = new ArrayList<>();
 
     public Clue(int[] digits) {
         this.digits = digits;
     }
 
     public boolean hasSureAnswer() {
-        return possibleAnswers.size() == 1;
+        return matchingWords.size() == 1;
     }
 
-    public void updatePatternAndMatchingWords(String[] solvedLetters, Dictionary dictionary) {
+    public void updatePatternAndMatchingWords(String[] solvedLetters, Set<String> dictionaryWords) {
         updatePattern(solvedLetters);
-        updateMatchingWords(solvedLetters, dictionary);
+        updateMatchingWords(solvedLetters, dictionaryWords);
     }
 
     void updatePattern(String[] solvedLetters) {
@@ -47,30 +38,17 @@ public class Clue {
         this.pattern = Pattern.compile(sb.toString());
     }
 
-    private void updateMatchingWords(String[] solvedLetters, Dictionary dictionary) {
-        Set<String> wordsByLength = dictionary.getWordsByLength(pattern.pattern().length());
-
-        // todo: early skip if there are no clues (optimisation)
-
-        possibleAnswers.clear();
-
-        int numMatchingAnswers = 0;
-        List<String> matchingAnswers = new ArrayList<>();
-
-        for (String word : wordsByLength) {
-            if (pattern.matcher(word).matches() && isValid(word, solvedLetters)) {
-                if (numMatchingAnswers <= MAX_MATCHING_ANSWERS) {
-                    matchingAnswers.add(word);
+    private void updateMatchingWords(String[] solvedLetters, Set<String> dictionaryWords) {
+        if (matchingWords.isEmpty()) {
+            // Build up the matching words from the dictionary
+            for (String dictionaryWord : dictionaryWords) {
+                if (pattern.matcher(dictionaryWord).matches() && isValid(dictionaryWord, solvedLetters)) {
+                    matchingWords.add(dictionaryWord);
                 }
-                numMatchingAnswers++;
             }
-        }
-
-        numPossibleAnswers = numMatchingAnswers;
-
-        // Update possible answers only if there are a "small" number
-        if (numMatchingAnswers <= MAX_MATCHING_ANSWERS) {
-            possibleAnswers.addAll(matchingAnswers);
+        } else {
+            // Shrink down the words that are already matched
+            matchingWords.removeIf(prematchedWord -> !pattern.matcher(prematchedWord).matches() || !isValid(prematchedWord, solvedLetters));
         }
     }
 
@@ -102,8 +80,8 @@ public class Clue {
     public String toString() {
         return "Clue{" +
                 "digits=" + Arrays.toString(digits) +
-                ", possibleAnswers=" + possibleAnswers +
-                ", numPossibleAnswers=" + numPossibleAnswers +
+                ", pattern=" + pattern +
+                ", numMatchingWords=" + matchingWords.size() +
                 '}';
     }
 }
