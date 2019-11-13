@@ -83,7 +83,11 @@ public class Clueless {
                 Clue clue = clueIterator.next();
 
                 if (clue.hasSureAnswer()) {
-                    log.debug("Clue {} can only be {}", clue.pattern.pattern(), clue.matchingWords.get(0));
+                    if (clue.pattern.pattern().equals(clue.matchingWords.get(0))) {
+                        log.debug("Clue {} is already solved", clue.pattern.pattern());
+                    } else {
+                        log.debug("Clue {} can only be {}", clue.pattern.pattern(), clue.matchingWords.get(0));
+                    }
                     updateSolvedLettersWithAnswer(clue, clue.matchingWords.get(0), solvedLetters);
                     newLetterDiscovered = true;
                     clueIterator.remove();

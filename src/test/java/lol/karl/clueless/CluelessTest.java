@@ -5,8 +5,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -22,29 +21,31 @@ public class CluelessTest {
     }
 
     @Test
-    public void testClueIsValid() {
+    public void testClueMatchingRejectsDuplicates() {
         String[] solvedLetters = new String[27];
         solvedLetters[9] = "E";
         solvedLetters[14] = "R";
 
         Clue clue = new Clue(new int[]{9, 14, 8});
-        clue.updatePattern(solvedLetters);
+        clue.updatePatternAndMatchingWords(solvedLetters, new HashSet<>(Arrays.asList("ERR", "ERA", "OIL")));
 
-        assertThat(clue.isValid("ERR", solvedLetters), is(false));
-        assertThat(clue.isValid("ERA", solvedLetters), is(true));
+        assertThat(clue.matchingWords.contains("OIL"), is(false));
+        assertThat(clue.matchingWords.contains("ERR"), is(false));
+        assertThat(clue.matchingWords.contains("ERA"), is(true));
     }
 
     @Test
-    public void testClueIsvalidComplexCase() {
+    public void testClueMatchingRejectsNumbering() {
         String[] solvedLetters = new String[27];
         solvedLetters[9] = "T";
         solvedLetters[14] = "H";
 
         Clue clue = new Clue(new int[]{9, 14, 8, 1, 8});
-        clue.updatePattern(solvedLetters);
+        clue.updatePatternAndMatchingWords(solvedLetters, new HashSet<>(Arrays.asList("THERE", "THREE", "BUNNY")));
 
-        assertThat(clue.isValid("THERE", solvedLetters), is(true));
-        assertThat(clue.isValid("THREE", solvedLetters), is(false));
+        assertThat(clue.matchingWords.contains("THERE"), is(true));
+        assertThat(clue.matchingWords.contains("THREE"), is(false));
+        assertThat(clue.matchingWords.contains("BUNNY"), is(false));
     }
 
     @Test

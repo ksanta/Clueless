@@ -42,30 +42,39 @@ public class Clue {
         if (matchingWords.isEmpty()) {
             // Build up the matching words from the dictionary
             for (String dictionaryWord : dictionaryWords) {
-                if (pattern.matcher(dictionaryWord).matches() && isValid(dictionaryWord, solvedLetters)) {
+                if (matches(dictionaryWord, solvedLetters)) {
                     matchingWords.add(dictionaryWord);
                 }
             }
         } else {
             // Shrink down the words that are already matched
-            matchingWords.removeIf(prematchedWord -> !pattern.matcher(prematchedWord).matches() || !isValid(prematchedWord, solvedLetters));
+            matchingWords.removeIf(prematchedWord -> !matches(prematchedWord, solvedLetters));
         }
     }
 
     /**
-     * Checks that letters are not being reused. Eg: "ER." cannot match "ERE" or "ERR".
-     * "TH..." (21, 8, 5, 19, 5) rejects THREE and accept THERE
+     * Checks:
+     * <ul>
+     *  <li>The given word matches the regex pattern</li>
+     *  <li>The solved letters cannot contain duplicate letters</li>
+     *  <li>Different letters from the clue cannot refer to the same solved letter</li>
+     * </ul>
      */
-    public boolean isValid(String word, String[] solvedLetters) {
+    boolean matches(String word, String[] solvedLetters) {
+        // The given word must match the regex pattern
+        if (!pattern.matcher(word).matches()) {
+            return false;
+        }
+
         String[] solvedCopy = Arrays.copyOf(solvedLetters, solvedLetters.length);
         for (int i = 0; i < pattern.pattern().length(); i++) {
             if (pattern.pattern().charAt(i) == '.') {
-                // Characters in the unknown spots cannot be already used
+                // Cannot contain duplicate letters
                 String charInWord = String.valueOf(word.charAt(i));
                 if (Arrays.asList(solvedLetters).contains(charInWord)) {
                     return false;
                 }
-                // Characters in the unknown spots must adhere to numbering in the clue
+                // Must not change a letter that has already been set
                 String charFromSolution = solvedCopy[digits[i]];
                 if (charFromSolution != null && !charFromSolution.equals(charInWord)) {
                     return false;
